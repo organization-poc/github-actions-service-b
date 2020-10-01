@@ -2,9 +2,9 @@ name: dotnet-core-build
 
 on:
   push:
-    branches: [ exclude ]
-  #pull_request:
-    #branches: [ master ]
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -23,3 +23,12 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+
+    - name: helm setup
+      run: curl -O https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz && tar -zxvf helm-v3.3.4-linux-amd64.tar.gz
+    - name: helm plugin setup
+      run: /home/docker/actions-runner/_work/github-actions-service-a/github-actions-service-a/linux-amd64/helm plugin install https://github.com/chartmuseum/helm-push.git
+    - name: helm repo add
+      run: /home/docker/actions-runner/_work/github-actions-service-a/github-actions-service-a/linux-amd64/helm repo add chart-museum http://chartmuseum:8080
+    - name: helm push
+      run: /home/docker/actions-runner/_work/github-actions-service-a/github-actions-service-a/linux-amd64/helm push kubernetes/helm/service-b/ chart-museum
